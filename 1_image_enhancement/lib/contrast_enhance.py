@@ -14,17 +14,23 @@ def gamma_correct(img, gamma):
     return new_img
 
 
+def get_hist_eq_mapping(img):
+    hist, bins = np.histogram(img.flatten(), 256, [0, 256])
+    cdf = hist.cumsum()
+    scaled_cdf = (cdf / cdf.max()) * 255
+    
+    return scaled_cdf
+
+
 def hist_equalize(img):
     if img.shape[-1] == 3:
         img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     else:
         img_gray = img
 
-    hist, bins = np.histogram(img_gray.flatten(), 256, [0, 256])
-    cdf = hist.cumsum()
-    rel_cdf = cdf / cdf.max()
+    mapping = get_hist_eq_mapping(img_gray)
+    new_img = mapping[img]
 
-    new_img = rel_cdf[img] * 255
     new_img = new_img.astype(np.uint8)
 
     return new_img
