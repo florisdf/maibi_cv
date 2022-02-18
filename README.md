@@ -5,7 +5,7 @@ at the master AI for Business and Industry.
 
 # Getting started on your own pc
 
-## Install Python 3.9 and pip
+## Install Python 3.6 and pip
 
 If this is not yes installed, see <https://www.python.org/downloads/> for
 instructions.
@@ -30,7 +30,13 @@ cd maibi_cv
 Create a new virtual environment.
 
 ```bash
-python3.9 -m venv .venv
+python3.6 -m venv .venv
+```
+
+**Note**: it is possible that this command fails to run because `venv` is not installed yet. For Ubuntu, this can be installed with
+
+```bash
+sudo apt install python3.6-venv
 ```
 
 Activate the environment you just created:
@@ -51,7 +57,7 @@ Run the following command in your terminal. **Make sure that**:
 
 1. You are in the directory of this repository (so in the directory called
    `maibi_cv`).
-2. You have **activated the virtual environment** with `python3.9 -m venv .venv`.
+2. You have **activated the virtual environment** with `python3.6 -m venv .venv`.
 
 ```bash
 jupyter notebook
