@@ -35,26 +35,55 @@ def build_plot_wrapper(func):
         func(img, *args, **kwargs)
     return plot_wrapper
 
-def interact_img_repr(img_files=['data/verona_bw.png', 'data/verona_gray.jpg', 'data/verona_color.jpg']):
-    x_slider = widgets.IntSlider(min=0, max=960, value=782, continuous_update=False)
-    y_slider = widgets.IntSlider(min=0, max=1280, value=186, continuous_update=False)
-    size_slider = widgets.IntSlider(min=1, max=30, value=15, continuous_update=False)
 
-    def plot_wrapper(img_file, x0, y0, size):
+def build_plot_wrapper_with_crop(
+    func, crop_x_slider, crop_y_slider,
+    crop_size_slider
+):
+    def plot_wrapper(img_file, *args, **kwargs):
         img = read_and_convert_img(img_file)
 
-        if len(img.shape) == 2:
-            img = img[..., None]
+        height, width = img.shape[:2]
+        crop_x_slider.min = 0
+        crop_y_slider.min = 0
+        crop_x_slider.max = width
+        crop_y_slider.max = height
+        crop_size_slider.max = min(height, width, crop_size_slider.max)
 
-        height, width, channels = img.shape
-        x_slider.max = width
-        y_slider.max = height
-        return plot_img_repr(img, x0, y0, size)
+        func(img, *args, **kwargs)
+
+    return plot_wrapper
+
+
+def interact_with_crop(func, x0_value=0, y0_value=0,
+                       size_value=10,
+                       size_max=100,
+                       *args, **kwargs):
+    crop_x_slider = widgets.IntSlider(min=0, max=x0_value, value=x0_value, continuous_update=False)
+    crop_y_slider = widgets.IntSlider(min=0, max=y0_value, value=y0_value, continuous_update=False)
+    crop_size_slider = widgets.IntSlider(min=1, max=size_max, value=size_value, continuous_update=False)
 
     interact(
-        plot_wrapper,
+        build_plot_wrapper_with_crop(
+            func, crop_x_slider, crop_y_slider,
+            crop_size_slider
+        ),
+        *args,
+        **kwargs,
+        crop_x0=crop_x_slider,
+        crop_y0=crop_y_slider,
+        crop_size=crop_size_slider,
+    )
+
+
+def interact_img_repr(img_files=['data/verona_bw.png', 'data/verona_gray.jpg', 'data/verona_color.jpg']):
+    return interact_with_crop(
+        plot_img_repr,
         img_file=img_files,
-        x0=x_slider, y0=y_slider, size=size_slider
+        x0_value=782,
+        y0_value=186,
+        size_value=15,
+        size_max=30,
     )
 
 
@@ -118,32 +147,42 @@ def interact_clahe(img_files=['data/verona_color.jpg', 'data/verona_gray.jpg']):
 def interact_mean_kernel(img_files=['data/verona_color.jpg', 'data/verona_gray.jpg']):
     size_slider = widgets.IntSlider(min=1, max=50, value=3, continuous_update=False)
 
-    interact(
-        build_plot_wrapper(plot_mean_kernel),
+    interact_with_crop(
+        plot_mean_kernel,
         img_file=img_files,
         size=size_slider,
+        x0_value=782,
+        y0_value=186,
+        size_value=100,
+        size_max=500,
     )
 
 
 def interact_gaussian_kernel(img_files=['data/verona_color.jpg', 'data/verona_gray.jpg']):
     size_slider = widgets.IntSlider(min=2, max=50, value=3, continuous_update=False)
-    sigma_slider = widgets.FloatSlider(min=0, max=3, value=0, continuous_update=False)
 
-    interact(
-        build_plot_wrapper(plot_gaussian_kernel),
+    interact_with_crop(
+        plot_gaussian_kernel,
         img_file=img_files,
         size=size_slider,
-        sigma=sigma_slider,
+        x0_value=782,
+        y0_value=186,
+        size_value=100,
+        size_max=500,
     )
 
 
 def interact_median_kernel(img_files=['data/verona_color.jpg', 'data/verona_gray.jpg']):
     size_slider = widgets.IntSlider(min=3, max=51, value=3, step=2, continuous_update=False)
 
-    interact(
-        build_plot_wrapper(plot_median_kernel),
+    interact_with_crop(
+        plot_median_kernel,
         img_file=img_files,
         size=size_slider,
+        x0_value=782,
+        y0_value=186,
+        size_value=100,
+        size_max=500,
     )
     
 def interact_denoise_with_filters(
@@ -152,20 +191,28 @@ def interact_denoise_with_filters(
     size_slider = widgets.IntSlider(min=3, max=51, value=3, step=2, continuous_update=False)
     noise_amount_slider = widgets.FloatSlider(min=0, max=1, step=0.01, value=0.01, continuous_update=False)
 
-    def plot_wrapper(img_file, filter_size, noise, noise_amount):
-        img = read_and_convert_img(img_file)[:100, :100, :]
-
+    def plot_multi_filter_wrapper(
+        img, filter_size, noise, noise_amount,
+        crop_x0, crop_y0, crop_size
+    ):
         if noise == 'Salt and pepper':
             img = add_salt_pepper_noise(img, amount=1*noise_amount)
         elif noise == 'Gaussian':
             img = add_gaussian_noise(img, 0, 255*noise_amount)
 
-        return plot_multi_filter(img, filter_size)
-    
-    interact(
-        plot_wrapper,
+        plot_multi_filter(
+            img, filter_size, crop_x0,
+            crop_y0, crop_size
+        )
+
+    interact_with_crop(
+        plot_multi_filter_wrapper,
         img_file=img_files,
         filter_size=size_slider,
         noise=['Salt and pepper', 'Gaussian'],
         noise_amount=noise_amount_slider,
+        x0_value=782,
+        y0_value=186,
+        size_value=100,
+        size_max=500,
     )

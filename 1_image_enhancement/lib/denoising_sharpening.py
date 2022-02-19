@@ -42,7 +42,7 @@ def add_salt_pepper_noise(img, amount=0.01):
     coords_x_salt, coords_x_pepper = np.split(coords_x, 2)
     
     new_img = np.copy(img)
-    new_img[coords_y_salt, coords_x_salt, :] = 0
-    new_img[coords_y_pepper, coords_x_pepper, :] = 255
+    new_img[coords_y_salt, coords_x_salt] = 0
+    new_img[coords_y_pepper, coords_x_pepper] = 255
 
     return new_img

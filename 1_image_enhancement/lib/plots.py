@@ -22,16 +22,27 @@ from .denoising_sharpening import (
 )
 
 
-def plot_img_repr(img, x0, y0, size):
-    height, width, channels = img.shape
+def get_xy_slices(img, x0, y0, size):
+    height, width = img.shape[:2]
 
     y1 = min(y0 + size, height)
     x1 = min(x0 + size, width)
     slice_y = slice(y0, y1)
     slice_x = slice(x0, x1)
 
+    return slice_x, slice_y
+
+def plot_img_repr(img, crop_x0, crop_y0, crop_size):
+    if len(img.shape) == 2:
+        img = img[..., None]
+
+    height, width, channels = img.shape
+
     ncols = channels + 1
     fig, axes = plt.subplots(ncols=ncols, figsize=(6*ncols, 6))
+
+    slice_x, slice_y = get_xy_slices(img, crop_x0, crop_y0, crop_size)
+    plot_img_slice(img, slice_x, slice_y, axes=axes[0:2])
 
     channel_names = ['Red values', 'Green values', 'Blue values'] if channels == 3 else ['Gray values']
     for i, ax in enumerate(axes[1:]):
@@ -45,11 +56,26 @@ def plot_img_repr(img, x0, y0, size):
         ax.set_title(channel_name)
         ax.imshow(img_slice, cmap='gray', vmin=0, vmax=255)
 
-    img_copy = np.copy(img)
-    cv2.rectangle(img_copy, (x0, y0), (x1, y1), color=(255, 0, 0), thickness=5)
-    axes[0].imshow(img_copy, cmap='gray' if channels == 1 else None)
     axes[0].set_xlabel('x')
     axes[0].set_ylabel('y')
+
+        
+def plot_img_slice(img, slice_x, slice_y, axes=None):
+    is_color = (img.shape[-1] == 3)
+
+    if axes is None:
+        ncols = 2
+        fig, axes = plt.subplots(ncols=ncols, figsize=(ncols*6, 4))
+
+    x0, y0 = slice_x.start, slice_y.start
+    x1, y1 = slice_x.stop, slice_y.stop
+
+    img_copy = np.copy(img)
+    cv2.rectangle(img_copy, (x0, y0), (x1, y1), color=(255, 0, 0), thickness=5)
+    axes[0].imshow(img_copy, cmap='gray' if not is_color else None)
+
+    img_slice = img[slice_y, slice_x]
+    axes[1].imshow(img_slice)
 
     for (x_a, y_a), (x_b, y_b) in zip(product([x0], [y0, y1]),
                                       product([0], [1, 0])):
@@ -57,7 +83,7 @@ def plot_img_repr(img, x0, y0, size):
                               coordsB="axes fraction",
                               axesA=axes[0], axesB=axes[1], color="red")
         axes[1].add_artist(con)
-
+    
 
 def plot_img_hist(img, axes=None, log=False):
     is_color = (img.shape[-1] == 3)
@@ -158,12 +184,14 @@ def plot_contrast_enhance(img, new_img, nrows=2, log=False):
     return axes
 
 
-def plot_kernel(img, kernel, use_frac=True):
-    ncols = 3
-    fig, axes = plt.subplots(ncols=ncols, figsize=(6*ncols, 6))
+def plot_kernel(img, kernel, name, crop_x0=0, crop_y0=0, crop_size=100, use_frac=True):
+    ncols = 2
+    nrows = 3
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(6*ncols, 6*nrows))
 
-    axes[0].set_title('Kernel')
-    axes[0].imshow(kernel, cmap='gray')
+    axes[0][0].set_title('Kernel')
+    axes[0][0].imshow(kernel, cmap='gray')
+    axes[0][1].set_axis_off()
 
     kernel_mean = kernel.mean()
 
@@ -178,63 +206,76 @@ def plot_kernel(img, kernel, use_frac=True):
                         text = f'{value:.2f}'
                 else:
                     text = str(value)
-                axes[0].text(j, i, text,
-                             ha="center", va="center", color="w" if value <= kernel_mean else "black")
+                axes[0][0].text(j, i, text,
+                                ha="center", va="center",
+                                color="w" if value <= kernel_mean else "black")
 
     # Turn spines off and create white grid.
-    axes[0].spines[:].set_visible(False)
-    axes[0].set_xticks(np.arange(kernel.shape[1]+1)-.5)
-    axes[0].set_yticks(np.arange(kernel.shape[0]+1)-.5)
-    axes[0].set_xticklabels([])
-    axes[0].set_yticklabels([])
-    axes[0].grid(color="w", linewidth=2)
+    axes[0][0].spines[:].set_visible(False)
+    axes[0][0].set_xticks(np.arange(kernel.shape[1]+1)-.5)
+    axes[0][0].set_yticks(np.arange(kernel.shape[0]+1)-.5)
+    axes[0][0].set_xticklabels([])
+    axes[0][0].set_yticklabels([])
+    axes[0][0].grid(color="w", linewidth=2)
 
-    axes[1].set_title('Old image')
-    axes[1].imshow(img)
+    slice_x, slice_y = get_xy_slices(img, crop_x0, crop_y0, crop_size)
+
+    axes[1][0].set_title('Original image')
+    plot_img_slice(img, slice_x, slice_y, axes=axes[1])
     
-    axes[2].set_title('New image')
+    axes[2][0].set_title(f'Filtered image ({name})')
     new_img = cv2.filter2D(img, -1, kernel)
-    axes[2].imshow(new_img)
+    plot_img_slice(new_img, slice_x, slice_y, axes=axes[2])
 
 
-def plot_mean_kernel(img, size):
+def plot_mean_kernel(img, size, crop_x0=0, crop_y0=0, crop_size=100):
     kernel = build_mean_kernel(size)
-    plot_kernel(img, kernel)
+    plot_kernel(img, kernel, f'{size}x{size} mean', crop_x0, crop_y0, crop_size)
 
 
-def plot_gaussian_kernel(img, size, sigma=0):
+def plot_gaussian_kernel(img, size, sigma=0, crop_x0=0,
+                         crop_y0=0, crop_size=100):
     kernel = build_gaussian_kernel(size, sigma)
-    plot_kernel(img, kernel, use_frac=False)
+    plot_kernel(img, kernel, f'{size}x{size} Gaussian', crop_x0, crop_y0, crop_size, use_frac=False)
 
 
-def plot_median_kernel(img, size):
+def plot_median_kernel(img, size, crop_x0=0,
+                       crop_y0=0, crop_size=100):
     new_img = apply_median_kernel(img, size)
+
     ncols = 2
-    fig, axes = plt.subplots(ncols=ncols, figsize=(6*ncols, 6))
+    nrows = 2
+    fig, axes = plt.subplots(ncols=ncols, nrows=nrows, figsize=(6*ncols, 6*nrows))
 
-    axes[0].set_title('Old image')
-    axes[0].imshow(img)
-    
-    axes[1].set_title('New image')
-    axes[1].imshow(new_img)
+    slice_x, slice_y = get_xy_slices(img, crop_x0, crop_y0, crop_size)
+
+    axes[0][0].set_title('Original image')
+    plot_img_slice(img, slice_x, slice_y, axes=axes[0])
+
+    axes[1][0].set_title(f'Filtered image ({size}x{size} median)')
+    plot_img_slice(new_img, slice_x, slice_y, axes=axes[1])
 
 
-def plot_multi_filter(img, size):
+def plot_multi_filter(img, size, crop_x0=0,
+                      crop_y0=0, crop_size=100):
     med_img = apply_median_kernel(img, size)
     mean_img = apply_mean_kernel(img, size)
     gauss_img = apply_gaussian_kernel(img, size)
 
-    ncols = 4
-    fig, axes = plt.subplots(ncols=ncols, figsize=(6*ncols, 6))
+    ncols = 2
+    nrows = 4
+    fig, axes = plt.subplots(ncols=ncols, nrows=nrows, figsize=(6*ncols, 6*nrows))
 
-    axes[0].set_title('Original')
-    axes[0].imshow(img)
+    slice_x, slice_y = get_xy_slices(img, crop_x0, crop_y0, crop_size)
 
-    axes[1].set_title('Mean filter')
-    axes[1].imshow(mean_img)
+    axes[0][0].set_title('Original')
+    plot_img_slice(img, slice_x, slice_y, axes=axes[0])
 
-    axes[2].set_title('Gaussian filter')
-    axes[2].imshow(gauss_img)
+    axes[1][0].set_title(f'Filtered with {size}x{size} mean')
+    plot_img_slice(mean_img, slice_x, slice_y, axes=axes[1])
 
-    axes[3].set_title('Median filter')
-    axes[3].imshow(med_img)
+    axes[2][0].set_title(f'Filtered with {size}x{size} Gaussian filter')
+    plot_img_slice(gauss_img, slice_x, slice_y, axes=axes[2])
+    
+    axes[3][0].set_title(f'Filtered with {size}x{size} median filter')
+    plot_img_slice(med_img, slice_x, slice_y, axes=axes[3])
