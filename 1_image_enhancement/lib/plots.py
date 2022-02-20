@@ -16,9 +16,15 @@ from .contrast_enhance import (
 from .denoising_sharpening import (
     build_mean_kernel,
     build_gaussian_kernel,
+    build_laplacian_kernel,
+    build_sharpening_kernel,
     apply_median_kernel,
     apply_mean_kernel,
     apply_gaussian_kernel,
+    apply_laplacian_kernel,
+    apply_sharpening_kernel,
+    apply_unsharp_mask,
+    apply_DoG,
 )
 
 
@@ -184,10 +190,12 @@ def plot_contrast_enhance(img, new_img, nrows=2, log=False):
     return axes
 
 
-def plot_kernel(img, kernel, name, crop_x0=0, crop_y0=0, crop_size=100, use_frac=True):
-    ncols = 2
-    nrows = 3
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(6*ncols, 6*nrows))
+def plot_kernel(img, kernel, name, crop_x0=0, crop_y0=0, crop_size=100, use_frac=True,
+                axes=None):
+    if axes is None:
+        ncols = 2
+        nrows = 3
+        fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(6*ncols, 6*nrows))
 
     axes[0][0].set_title('Kernel')
     axes[0][0].imshow(kernel, cmap='gray')
@@ -233,9 +241,9 @@ def plot_mean_kernel(img, size, crop_x0=0, crop_y0=0, crop_size=100):
     plot_kernel(img, kernel, f'{size}x{size} mean', crop_x0, crop_y0, crop_size)
 
 
-def plot_gaussian_kernel(img, size, sigma=0, crop_x0=0,
+def plot_gaussian_kernel(img, size, crop_x0=0,
                          crop_y0=0, crop_size=100):
-    kernel = build_gaussian_kernel(size, sigma)
+    kernel = build_gaussian_kernel(size)
     plot_kernel(img, kernel, f'{size}x{size} Gaussian', crop_x0, crop_y0, crop_size, use_frac=False)
 
 
@@ -279,3 +287,72 @@ def plot_multi_filter(img, size, crop_x0=0,
     
     axes[3][0].set_title(f'Filtered with {size}x{size} median filter')
     plot_img_slice(med_img, slice_x, slice_y, axes=axes[3])
+
+
+
+def plot_laplacian_kernel(img, crop_x0=0, crop_y0=0, crop_size=100):
+    kernel = build_laplacian_kernel()
+    plot_kernel(img, kernel, f'Laplacian', crop_x0, crop_y0, crop_size)
+
+    
+def plot_sharpening_kernel(img, crop_x0=0, crop_y0=0, crop_size=100):
+    kernel = build_sharpening_kernel()
+    plot_kernel(img, kernel, f'Sharpening', crop_x0, crop_y0, crop_size)
+
+
+def plot_unsharp_mask(img, size, crop_x0=0, crop_y0=0, crop_size=100):
+    new_img = apply_unsharp_mask(img, size)
+
+    ncols = 2
+    nrows = 2
+    fig, axes = plt.subplots(ncols=ncols, nrows=nrows, figsize=(6*ncols, 6*nrows))
+
+    slice_x, slice_y = get_xy_slices(img, crop_x0, crop_y0, crop_size)
+
+    axes[0][0].set_title('Original image')
+    plot_img_slice(img, slice_x, slice_y, axes=axes[0])
+
+    axes[1][0].set_title(f'Filtered with unsharp mask (size {size}x{size})')
+    plot_img_slice(new_img, slice_x, slice_y, axes=axes[1])
+
+
+def plot_DoG(img, size_1, size_2, crop_x0=0, crop_y0=0, crop_size=100):
+    new_img = apply_DoG(img, size_1, size_2)
+
+    ncols = 2
+    nrows = 2
+    fig, axes = plt.subplots(ncols=ncols, nrows=nrows, figsize=(6*ncols, 6*nrows))
+
+    slice_x, slice_y = get_xy_slices(img, crop_x0, crop_y0, crop_size)
+
+    axes[0][0].set_title('Original image')
+    plot_img_slice(img, slice_x, slice_y, axes=axes[0])
+
+    axes[1][0].set_title(f'Filtered with DoG (size 1 = {size_1}; size 2 = {size_2})')
+    plot_img_slice(new_img, slice_x, slice_y, axes=axes[1])
+
+
+def plot_multi_sharpening(img, size, crop_x0=0,
+                          crop_y0=0, crop_size=100):
+    sharpening_img = apply_sharpening_kernel(img)
+    unsharp_img = apply_unsharp_mask(img, size)
+    size_2 = size * 5
+    dog_img = apply_DoG(img, size, size_2)
+
+    ncols = 2
+    nrows = 4
+    fig, axes = plt.subplots(ncols=ncols, nrows=nrows, figsize=(6*ncols, 6*nrows))
+
+    slice_x, slice_y = get_xy_slices(img, crop_x0, crop_y0, crop_size)
+
+    axes[0][0].set_title('Original')
+    plot_img_slice(img, slice_x, slice_y, axes=axes[0])
+
+    axes[1][0].set_title(f'Filtered with sharpening')
+    plot_img_slice(sharpening_img, slice_x, slice_y, axes=axes[1])
+
+    axes[2][0].set_title(f'Filtered with {size}x{size} unsharp mask')
+    plot_img_slice(unsharp_img, slice_x, slice_y, axes=axes[2])
+    
+    axes[3][0].set_title(f'Filtered with DoG (size 1 = {size}; size 2 = {size_2})')
+    plot_img_slice(dog_img, slice_x, slice_y, axes=axes[3])
