@@ -1,3 +1,5 @@
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/florisdf/maibi_cv/HEAD)
+
 # Computer Vision - MAIBI
 
 This repository contains the notebooks for the course of Computer Vision, given 
@@ -45,7 +47,13 @@ Activate the environment you just created:
 source .venv/bin/activate
 ```
 
-Install the requirements into the virtual environment.
+Also, make sure pip has the most recent version.
+
+```bash
+pip install --upgrade pip
+```
+
+Finally, install the requirements into the virtual environment.
 
 ```bash
 pip install -r requirements.txt
