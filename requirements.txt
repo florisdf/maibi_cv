@@ -1,5 +1,6 @@
 jupyter==1.0.0
 opencv-python==4.5.5.62
 torch==1.10.2
-matplotlib==3.5.1
-pandas==1.4.1
+matplotlib
+h5py
+tqdm
