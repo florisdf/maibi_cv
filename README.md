@@ -45,7 +45,13 @@ Activate the environment you just created:
 source .venv/bin/activate
 ```
 
-Install the requirements into the virtual environment.
+Also, make sure pip has the most recent version.
+
+```bash
+pip install --upgrade pip
+```
+
+Finally, install the requirements into the virtual environment.
 
 ```bash
 pip install -r requirements.txt
