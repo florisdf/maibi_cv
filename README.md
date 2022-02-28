@@ -65,7 +65,7 @@ Run the following command in your terminal. **Make sure that**:
 
 1. You are in the directory of this repository (so in the directory called
    `maibi_cv`).
-2. You have **activated the virtual environment** with `python3.6 -m venv .venv`.
+2. You have **activated the virtual environment** with `source .venv/bin/activate`.
 
 ```bash
 jupyter notebook
