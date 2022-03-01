@@ -219,7 +219,6 @@ def plot_kernel(img, kernel, name, crop_x0=0, crop_y0=0, crop_size=100, use_frac
                                 color="w" if value <= kernel_mean else "black")
 
     # Turn spines off and create white grid.
-    axes[0][0].spines[:].set_visible(False)
     axes[0][0].set_xticks(np.arange(kernel.shape[1]+1)-.5)
     axes[0][0].set_yticks(np.arange(kernel.shape[0]+1)-.5)
     axes[0][0].set_xticklabels([])
