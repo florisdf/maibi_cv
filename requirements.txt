@@ -5,3 +5,4 @@ torchvision==0.11.3
 matplotlib
 h5py
 tqdm
+tensorboard
