@@ -77,3 +77,34 @@ def plot_sim_mat(sim_mat, gallery_labels=None, query_labels=None):
         ax.set_xticklabels(query_labels)
 
     plt.colorbar(im)
+
+
+def plot_conf_mat(cmat, labels=None):
+    """
+    Plot a confusion matrix.
+    
+    Args:
+        cmat: The confusion matrix.
+        labels: The labels corresponding to the confusion matrix.
+    """
+    fig, ax = plt.subplots()
+    ax.imshow(cmat)
+    ax.set_ylabel('True label')
+    ax.set_xlabel('Predicted label')
+
+    N_LABELS = len(cmat)
+
+    ax.set_xticks(np.arange(N_LABELS))
+    if labels is not None:
+        ax.set_xticklabels(labels, rotation=90)
+
+    ax.set_yticks(np.arange(N_LABELS))
+    if labels is not None:
+        ax.set_yticklabels(labels)
+
+    for i in range(N_LABELS):
+        for j in range(N_LABELS):
+            ax.text(
+                x=i, y=j, s=str(cmat[i, j]),
+                ha="center", va="center",
+            )
