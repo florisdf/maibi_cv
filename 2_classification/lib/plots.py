@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from .cnn_classifiers import val_resize_crop
+from .evaluation_metrics import calc_pr_curve, calc_ap
 
 
 def plot_transformed_val_input(im):
@@ -108,3 +109,31 @@ def plot_conf_mat(cmat, labels=None):
                 x=i, y=j, s=str(cmat[i, j]),
                 ha="center", va="center",
             )
+
+
+def plot_pr_curves(sim_mat, gallery_labels, query_labels):
+    fig, ax = plt.subplots()
+
+    for label in gallery_labels:
+        p, r, _ = calc_pr_curve(label, sim_mat, gallery_labels, query_labels)
+
+        # Add (1.0, 0.0) for nicer visualization
+        p = np.array([0, *p])
+        r = np.array([1, *r])
+
+        ax.plot(r, p, label=label)
+        ax.set_xlabel('Precision')
+        ax.set_ylabel('Recall')
+
+    ax.grid()
+    ax.legend()
+
+
+def plot_aps(sim_mat, gallery_labels, true_labels):
+    fig, ax = plt.subplots()
+    ax.grid(zorder=0)
+
+    for label in gallery_labels:
+        ap = calc_ap(label, sim_mat, gallery_labels, true_labels)
+        ax.bar(label, ap, zorder=3)
+        ax.set_ylabel('Average Precision')
