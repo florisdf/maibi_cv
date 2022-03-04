@@ -11,17 +11,21 @@ from .cnn_classifiers import train_transform, val_transform
 def match_pretrained_embeddings(gallery, queries, model_name='resnet50'):
     model = get_cut_off_cnn(model_name).eval()
 
-    gallery_embs = torch.vstack([
+    gallery_embeddings = torch.vstack([
         get_im_embedding(Image.fromarray(img), model)
         for img in gallery
     ])
 
-    query_embs = torch.vstack([
+    query_embeddings = torch.vstack([
         get_im_embedding(Image.fromarray(img), model)
         for img in queries
     ])
 
-    return query_embs.matmul(gallery_embs.T)
+    return match_embeddings(gallery_embeddings, query_embeddings)
+
+
+def match_embeddings(gallery_embeddings, query_embeddings):
+    return query_embeddings.matmul(gallery_embeddings.T)
 
 
 def get_cut_off_cnn(name, pretrained=True):
