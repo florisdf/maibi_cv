@@ -6,3 +6,4 @@ matplotlib
 h5py
 tqdm
 tensorboard
+scikit-learn
