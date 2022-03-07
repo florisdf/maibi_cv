@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from itertools import chain
 
 import torch
 from torch import nn
@@ -37,6 +38,9 @@ train_transform = transforms.Compose([
 
 
 def get_cnn(name, pretrained=True):
+    """
+    Return a CNN.
+    """
     if name == 'alexnet':
         return alexnet(pretrained=pretrained)
     elif name == 'vgg19':
@@ -45,3 +49,49 @@ def get_cnn(name, pretrained=True):
         return inception_v3(pretrained=pretrained)
     elif name == 'resnet50':
         return resnet50(pretrained=pretrained)
+    else:
+        raise ValueError(f'Unknown model {name}')
+
+
+def get_cnn_clf(name, num_classes, pretrained=True):
+    """
+    Return a CNN to train as a classifier with a certain number of classes.
+    """
+    model = get_cnn(name, pretrained)
+
+    if name == 'alexnet':
+        model.classifier[-1] = nn.Linear(in_features=4096,
+                                         out_features=num_classes)
+    elif name == 'vgg19':
+        model.classifier[-1] = nn.Linear(in_features=4096,
+                                         out_features=num_classes)
+    elif name == 'inception_v3':
+        model.fc = nn.Linear(in_features=2048,
+                             out_features=num_classes)
+    elif name == 'resnet50':
+        model.fc = nn.Linear(in_features=2048,
+                             out_features=num_classes)
+
+    return model
+
+
+def get_top_parameters(model):
+    name = model.__class__.__name__.lower()
+
+    if name in ['alexnet', 'vgg']:
+        return list(model.classifier.parameters())
+    elif name == 'inception3':
+        return [
+            *model.Mixed_7c.parameters(),
+            *model.avgpool.parameters(),
+            *model.dropout.parameters(),
+            *model.fc.parameters(),
+        ]
+    elif name == 'resnet':
+        return [
+            *model.layer4.parameters(),
+            *model.avgpool.parameters(),
+            *model.fc.parameters(),
+        ]
+    else:
+        raise ValueError(f'Unknown model {name}')

@@ -132,6 +132,7 @@ def plot_pr_curves(sim_mat, gallery_labels, query_labels):
 def plot_aps(sim_mat, gallery_labels, true_labels):
     fig, ax = plt.subplots()
     ax.grid(zorder=0)
+    ax.set_ylim([0, 1])
 
     for label in gallery_labels:
         ap = calc_ap(label, sim_mat, gallery_labels, true_labels)

@@ -4,10 +4,10 @@ from pathlib import Path
 
 
 DEFAULT_LABELS = [
-    'CocaCola2L',
-    'Pepsi2L',
-    'Fanta2L',
-    'Sprite2L'
+    'CocaCola',
+    'Pepsi',
+    'Fanta',
+    'Sprite'
 ]
 
 
@@ -15,12 +15,12 @@ def get_gallery_and_queries_for_class(class_name):
     """
     Return the gallery image and query images for a certain class.
     """
-    gallery_img = cv2.imread(f'data/sodas/gallery/{class_name}/{class_name}_00.jpg')[..., ::-1]
+    gallery_img = cv2.imread(f'data/sodas/gallery/{class_name}/{class_name}_gallery_00.jpg')[..., ::-1]
 
     # The other images are used as queries
     query_imgs = [
         cv2.imread(str(img_path))[..., ::-1]
-        for img_path in Path('data/sodas/queries').glob(f'{class_name}/*.jpg')
+        for img_path in Path('data/sodas/query').glob(f'{class_name}/*.jpg')
     ]
 
     return gallery_img, query_imgs
