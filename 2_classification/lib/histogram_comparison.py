@@ -22,12 +22,13 @@ def match_opp_color_hist(gallery, queries):
         for img in queries
     ]
 
+    # Build and return N_q x N_g similarity matrix
     return np.array([
         [
             opp_hists_match_score(q_hist, g_hist)
-            for g_hist in gallery_hists
+            for g_hist in gallery_hists  # N_g columns
         ]
-        for q_hist in query_hists
+        for q_hist in query_hists  # N_q rows
     ])
 
 
