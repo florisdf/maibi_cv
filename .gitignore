@@ -5,3 +5,6 @@ __pycache__
 *.pth
 *.h5
 MNIST
+runs
+GroZi*
+downloads
