@@ -106,7 +106,7 @@ def plot_conf_mat(cmat, labels=None):
     for i in range(N_LABELS):
         for j in range(N_LABELS):
             ax.text(
-                x=i, y=j, s=str(cmat[i, j]),
+                x=i, y=j, s=str(cmat[j, i]),
                 ha="center", va="center",
             )
 
@@ -121,7 +121,7 @@ def plot_pr_curves(sim_mat, gallery_labels, query_labels):
         p = np.array([0, *p])
         r = np.array([1, *r])
 
-        ax.plot(r, p, label=label)
+        ax.plot(r, p, label=label, drawstyle="steps-post")
         ax.set_xlabel('Precision')
         ax.set_ylabel('Recall')
 
