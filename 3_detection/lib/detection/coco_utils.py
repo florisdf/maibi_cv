@@ -1,6 +1,5 @@
 import copy
 import os
-from PIL import Image
 
 import torch
 import torch.utils.data
@@ -9,7 +8,7 @@ import torchvision
 from pycocotools import mask as coco_mask
 from pycocotools.coco import COCO
 
-import transforms as T
+from .transforms import Compose
 
 
 class FilterAndRemapCocoCategories(object):
@@ -232,7 +231,7 @@ def get_coco(root, image_set, transforms, mode='instances'):
 
     if transforms is not None:
         t.append(transforms)
-    transforms = T.Compose(t)
+    transforms = Compose(t)
 
     img_folder, ann_file = PATHS[image_set]
     img_folder = os.path.join(root, img_folder)
