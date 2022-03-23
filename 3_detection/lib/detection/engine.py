@@ -101,6 +101,10 @@ def evaluate(model, data_loader, device, epoch, writer):
         evaluator_time = time.time()
         coco_evaluator.update(res)
         evaluator_time = time.time() - evaluator_time
+        if writer is not None:
+            log_idx = epoch * len(data_loader) + batch_idx
+            writer.add_scalar("Time/model", model_time, log_idx)
+            writer.add_scalar("Time/evaluator", evaluator_time, log_idx)
 
     coco_evaluator.synchronize_between_processes()
 
