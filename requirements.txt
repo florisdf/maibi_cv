@@ -9,3 +9,4 @@ tensorboard
 scikit-learn
 cython
 pycocotools
+segmentation-models-pytorch
