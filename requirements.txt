@@ -12,3 +12,4 @@ pycocotools
 segmentation-models-pytorch
 albumentations
 open3d
+k3d
