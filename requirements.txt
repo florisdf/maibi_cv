@@ -11,3 +11,4 @@ cython
 pycocotools
 segmentation-models-pytorch
 albumentations
+open3d
