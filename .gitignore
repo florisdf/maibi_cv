@@ -3,6 +3,7 @@ __pycache__
 .ipynb_checkpoints
 .DS_Store
 *.pth
+*.pt
 *.h5
 MNIST
 runs
