@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib.patches import ConnectionPatch
 from itertools import product
 from fractions import Fraction
+from .utils import lightness_only
 
 from .contrast_enhance import (
     linear_contrast_enhance,
@@ -91,10 +92,10 @@ def plot_img_slice(img, slice_x, slice_y, axes=None):
         axes[1].add_artist(con)
     
 
-def plot_img_hist(img, axes=None, log=False):
+def plot_img_hist(img, axes=None, log=False, lightness_only=False):
     is_color = (img.shape[-1] == 3)
 
-    if is_color:
+    if is_color and not lightness_only:
         if axes is None:
             fig, axes = plt.subplots(ncols=3, figsize=(3*6, 4), sharey=True)
 
@@ -122,6 +123,11 @@ def plot_img_hist(img, axes=None, log=False):
         else:
             ax = axes
 
+        if is_color and lightness_only:
+            lab = cv2.cvtColor(img, cv2.COLOR_RGB2LAB)[0]
+            img = list(cv2.split(lab))[0]
+            ax.set_title('Lightness')
+
         ax.set_ylabel('Pixel count')
         ax.set_xlabel('Pixel value')
         ax.hist(img.flatten(), bins=256, range=[0, 256], color='black')
@@ -129,13 +135,13 @@ def plot_img_hist(img, axes=None, log=False):
 
 def plot_linear_contrast_enhance(img, alpha, beta, log=False):
     new_img = linear_contrast_enhance(img, alpha, beta)
-    plot_contrast_enhance(img, new_img, log=log)
+    plot_contrast_enhance(img, new_img, log=log, lightness_only=False)
 
 
 def plot_gamma_correct(img, gamma, log=False):
     new_img = gamma_correct(img, gamma)
 
-    axes = plot_contrast_enhance(img, new_img, nrows=3, log=log)
+    axes = plot_contrast_enhance(img, new_img, nrows=3, log=log, lightness_only=False)
     xs = [x for x in range(256)]
     ys = [(x/255)**gamma*255 for x in xs]
 
@@ -161,29 +167,27 @@ def plot_hist_equalize(img, log=False):
         ax.set_axis_off()
 
 
-def plot_clahe(img, clip_limit, grid_size, log=False):
+def plot_clahe(img, clip_limit=2.0, grid_size=8, log=False):
     new_img = clahe(img, clip_limit, grid_size)
     plot_contrast_enhance(img, new_img, log=log)
 
 
-def plot_contrast_enhance(img, new_img, nrows=2, log=False):
-    if img.shape[-1] == 3:
-        is_color = True
-        ncols = 4
-    else:
-        is_color = False
-        ncols = 2
+def plot_contrast_enhance(img, new_img, nrows=2, log=False, lightness_only=True):
+    is_color = img.shape[-1] == 3
+    mult_ax = is_color and not lightness_only
+        
+    ncols = 4 if mult_ax else 2
 
     fig, axes = plt.subplots(ncols=ncols, nrows=nrows,
                              figsize=(ncols*6, nrows*5))
 
     axes[0][0].set_title('Old image')
     axes[0][0].imshow(img, vmin=0, vmax=255, cmap='gray' if not is_color else None)
-    plot_img_hist(img, axes[0][1:] if is_color else axes[0][1], log=log)
+    plot_img_hist(img, axes[0][1:] if mult_ax else axes[0][1], log=log, lightness_only=lightness_only)
 
     axes[1][0].set_title('New image')
     axes[1][0].imshow(new_img, vmin=0, vmax=255, cmap='gray' if not is_color else None)
-    plot_img_hist(new_img, axes[1][1:] if is_color else axes[1][1], log=log)
+    plot_img_hist(new_img, axes[1][1:] if mult_ax else axes[1][1], log=log, lightness_only=lightness_only)
 
     fig.tight_layout()
 

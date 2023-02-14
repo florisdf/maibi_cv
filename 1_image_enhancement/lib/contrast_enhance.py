@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from .utils import lightness_only
 
 
 def linear_contrast_enhance(img, alpha, beta):
@@ -14,39 +15,25 @@ def gamma_correct(img, gamma):
     return new_img
 
 
+@lightness_only
+def hist_equalize(img):
+    mapping = get_hist_eq_mapping(img)
+    new_img = mapping[img]
+    new_img = new_img.astype(np.uint8)
+    return new_img
+
+
 def get_hist_eq_mapping(img):
     hist, bins = np.histogram(img.flatten(), 256, [0, 256])
     cdf = hist.cumsum()
     scaled_cdf = (cdf / cdf.max()) * 255
-    
+
     return scaled_cdf
 
 
-def hist_equalize(img):
-    if img.shape[-1] == 3:
-        img_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    else:
-        img_gray = img
-
-    mapping = get_hist_eq_mapping(img_gray)
-    new_img = mapping[img]
-
-    new_img = new_img.astype(np.uint8)
-
-    return new_img
-    
-
-
+@lightness_only
 def clahe(img, clip_limit=2.0, grid_size=8):
     cv_clahe = cv2.createCLAHE(clipLimit=clip_limit,
                                tileGridSize=(grid_size,grid_size))
-
-    if img.shape[-1] == 3:
-        lab = cv2.cvtColor(img, cv2.COLOR_RGB2LAB)
-        lab_planes = list(cv2.split(lab))
-        lab_planes[0] = cv_clahe.apply(lab_planes[0])
-        lab = cv2.merge(lab_planes)
-        return cv2.cvtColor(lab, cv2.COLOR_LAB2RGB)
-    else:
-        return cv_clahe.apply(img)
+    return cv_clahe.apply(img)
         

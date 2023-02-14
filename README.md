@@ -1,13 +1,38 @@
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/florisdf/maibi_cv/HEAD)
 
 # Computer Vision - MAIBI
 
 This repository contains the notebooks for the course of Computer Vision, given 
 at the master AI for Business and Industry.
 
+# Setting up VSC OnDemand
+
+- Browse to <https://ondemand.hpc.kuleuven.be/> and log in
+- Click on *Login Server Shell Access*
+- Run the following commands:
+
+```bash
+git clone https://github.com/florisdf/maibi_cv.git
+cd maibi_cv
+conda create -n maibi_cv
+source activate maibi_cv
+pip install -r requirements.txt
+python -m ipykernel install --prefix=${VSC_HOME}/.local --name maibi_cv
+```
+
+- Go back to <https://ondemand.hpc.kuleuven.be/>
+- Click on *Jupyter Lab*
+- Fill in the fields:
+    - Partition: *interactive*
+    - Number of hours: *16*
+    - Number of nodes: *1*
+    - Required memory per core in megabytes: *3400*
+    - The *Number of cores* and *Number of gpu's* depend on the notebooks you'll be running. For simple notebooks, 1 core will suffice and you won't need any GPUs. For notebooks in which we you train a neural network, try 4 cores and 1 GPU.
+- Click *Launch*
+- Once Jupyter is running, click *Connect to Jupyter Lab*
+
 # Getting started on your own pc
 
-## Install Python 3.6 and pip
+## Install Python and pip
 
 If this is not yes installed, see <https://www.python.org/downloads/> for
 instructions.
@@ -32,13 +57,7 @@ cd maibi_cv
 Create a new virtual environment.
 
 ```bash
-python3.6 -m venv .venv
-```
-
-**Note**: it is possible that this command fails to run because `venv` is not installed yet. For Ubuntu, this can be installed with
-
-```bash
-sudo apt install python3.6-venv
+python -m venv .venv
 ```
 
 Activate the environment you just created:
