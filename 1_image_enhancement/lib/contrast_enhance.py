@@ -4,7 +4,7 @@ from .utils import lightness_only
 
 
 def linear_contrast_enhance(img, alpha, beta):
-    new_img = alpha * img + beta
+    new_img = float(alpha) * img + beta
     new_img = np.clip(new_img, 0, 255).astype(np.uint8)
     return new_img
 
