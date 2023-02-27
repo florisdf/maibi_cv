@@ -8,7 +8,8 @@ at the master AI for Business and Industry.
 
 - Browse to <https://ondemand.hpc.kuleuven.be/> and log in
 - Click on *Login Server Shell Access*
-- If you haven't yet done so, install `conda`:
+- Test if `conda` is installed by running `conda --version`. If this runs without an error message containing something like `command not found`, `conda` is installed.
+- If you do get a `command not found` error, you can install `conda` as follows:
 
 ```bash
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
