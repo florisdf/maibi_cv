@@ -25,7 +25,7 @@ git clone https://github.com/florisdf/maibi_cv.git
 cd maibi_cv
 conda create -n maibi_cv
 source activate maibi_cv
-pip install -r requirements.txt
+pip install -r requirements.txt --no-cache-dir
 python -m ipykernel install --prefix=${VSC_HOME}/.local --name maibi_cv
 ```
 
