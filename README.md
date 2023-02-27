@@ -11,6 +11,7 @@ at the master AI for Business and Industry.
 - Run the following commands:
 
 ```bash
+cd $VSC_DATA
 git clone https://github.com/florisdf/maibi_cv.git
 cd maibi_cv
 conda create -n maibi_cv
