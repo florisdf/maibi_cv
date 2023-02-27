@@ -8,6 +8,15 @@ at the master AI for Business and Industry.
 
 - Browse to <https://ondemand.hpc.kuleuven.be/> and log in
 - Click on *Login Server Shell Access*
+- If you haven't yet done so, install `conda`:
+
+```bash
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh -b -p $VSC_DATA/miniconda3
+echo 'export PATH="${VSC_DATA}/miniconda3/bin:${PATH}"' >> ~/.bashrc
+source ~/.bashrc
+```
+
 - Run the following commands:
 
 ```bash
