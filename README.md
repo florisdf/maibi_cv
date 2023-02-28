@@ -8,14 +8,25 @@ at the master AI for Business and Industry.
 
 - Browse to <https://ondemand.hpc.kuleuven.be/> and log in
 - Click on *Login Server Shell Access*
+- Test if Conda is installed by running `conda --version`. If this runs without an error message containing something like `command not found`, Conda is installed.
+- If you do get a `command not found` error, you can install Conda as follows:
+
+```bash
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh -b -p $VSC_DATA/miniconda3
+echo 'export PATH="${VSC_DATA}/miniconda3/bin:${PATH}"' >> ~/.bashrc
+source ~/.bashrc
+```
+
 - Run the following commands:
 
 ```bash
+cd $VSC_DATA
 git clone https://github.com/florisdf/maibi_cv.git
 cd maibi_cv
 conda create -n maibi_cv
 source activate maibi_cv
-pip install -r requirements.txt
+pip install -r requirements.txt --no-cache-dir
 python -m ipykernel install --prefix=${VSC_HOME}/.local --name maibi_cv
 ```
 
