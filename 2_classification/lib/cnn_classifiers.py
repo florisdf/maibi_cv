@@ -41,14 +41,15 @@ def get_cnn(name, pretrained=True):
     """
     Return a CNN.
     """
+    weights = 'IMAGENET1K_V1' if pretrained else None
     if name == 'alexnet':
-        return alexnet(pretrained=pretrained)
+        return alexnet(weights=weights)
     elif name == 'vgg19':
-        return vgg19(pretrained=pretrained)
+        return vgg19(weights=weights)
     elif name == 'inception_v3':
-        return inception_v3(pretrained=pretrained)
+        return inception_v3(weights=weights)
     elif name == 'resnet50':
-        return resnet50(pretrained=pretrained)
+        return resnet50(weights=weights)
     else:
         raise ValueError(f'Unknown model {name}')
 

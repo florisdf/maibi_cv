@@ -29,20 +29,21 @@ def match_embeddings(gallery_embeddings, query_embeddings):
 
 
 def get_cut_off_cnn(name, pretrained=True):
+    weights = 'IMAGENET1K_V1' if pretrained else None
     if name == 'alexnet':
-        model = alexnet(pretrained=pretrained)
+        model = alexnet(weights=weights)
         model.classifier = nn.Sequential(
             *list(model.classifier.children())[:-1]
         )
         return model
     elif name == 'vgg19':
-        model = vgg19(pretrained=pretrained)
+        model = vgg19(weights=weights)
         model.classifier = nn.Sequential(
             *list(model.classifier.children())[:-3]
         )
         return model
     elif name == 'inception_v3':
-        model = inception_v3(pretrained=pretrained)
+        model = inception_v3(weights=weights)
         model = nn.Sequential(
             OrderedDict(
                 list(model.named_children())[:-2]
@@ -50,7 +51,7 @@ def get_cut_off_cnn(name, pretrained=True):
         )
         return model
     elif name == 'resnet50':
-        model = resnet50(pretrained=pretrained)
+        model = resnet50(weights=weights)
         model = nn.Sequential(
             OrderedDict(
                 list(model.named_children())[:-1]

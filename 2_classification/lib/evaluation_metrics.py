@@ -90,7 +90,7 @@ def calc_pr_curve(label, sim_mat, gallery_labels, query_labels):
     precision and recall are evaluated by classifying the samples up until the rank as *positive*
     and those after the rank as *negative*. This is equivalent to choosing thresholds and
     classifying the queries under the threshold as negative and those equal to or above the
-    threshold as negative.
+    threshold as positive.
 
     An important issue is how to compose `y_score` and `y_true` correctly for the evaluation of
     the classification of a certain class label, given the similarity matrix. As described above,
@@ -109,7 +109,7 @@ def calc_pr_curve(label, sim_mat, gallery_labels, query_labels):
 
     The problem with this is, however, that **we will miss a constant number of false negatives**.
     This is because the queries that *do* belong to the chosen class but that will never be classified
-    *as* the chosen class (because there score is not the maximum similarity), will also not
+    *as* the chosen class (because their score is not the maximum similarity), will also not
     show up in `y_scores` and `y_true`. Hence, the denominator of the recall will be too small and
     the recall will be overestimated. Luckily, the denominator of the recall is constant as it is
     equal to the number of queries that truely have the chosen label. Hence, we can easily correct
@@ -142,6 +142,13 @@ def calc_pr_curve(label, sim_mat, gallery_labels, query_labels):
 
     # y_score tells which of these truely correspond to `label`
     y_true = query_labels[row_idxs] == label
+
+    # If no queries has a betch match for the given label,
+    # return a PR-curve with a single point at p = 1., r = 0.
+    if len(y_true) == 0:
+        return (np.array([0.]),
+                np.array([1.]),
+                np.array([0.]))
 
     # Calculate the PR-curve from y_true and y_score
     p, r, t = precision_recall_curve(y_true, y_score)
