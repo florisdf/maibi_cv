@@ -34,7 +34,7 @@ python -m ipykernel install --prefix=${VSC_HOME}/.local --name maibi_cv
 - Click on *Jupyter Lab*
 - Fill in the fields:
     - Partition: *interactive*
-    - Number of hours: *16*
+    - Number of hours: *4* (can have a value up to *16*)
     - Number of nodes: *1*
     - Required memory per core in megabytes: *3400*
     - The *Number of cores* and *Number of gpu's* depend on the notebooks you'll be running. For simple notebooks, 1 core will suffice and you won't need any GPUs. For notebooks in which we you train a neural network, try 4 cores and 1 GPU.
