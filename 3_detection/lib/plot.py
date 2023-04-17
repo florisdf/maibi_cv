@@ -119,9 +119,13 @@ def plot_pseudo_detection(
     tp = len(tp_boxes)
     fp = len(fp_boxes)
     fn = len(fn_boxes)
-    print(f'{"TP":^5}|{"FP":^5}|{"FN":^5}')
-    print(f'{"-"*5}|{"-"*5}|{"-"*5}')
-    print(f'{tp:^5}|{fp:^5}|{fn:^5}')
+    iou_str = f'@{iou_thresh:.2f}'
+    tp_str = f'TP{iou_str}'
+    fp_str = f'FP{iou_str}'
+    fn_str = f'FN{iou_str}'
+    print(f'{tp_str:^10}|{fp_str:^10}|{fn_str:^10}')
+    print(f'{"-"*10}|{"-"*10}|{"-"*10}')
+    print(f'{tp:^10}|{fp:^10}|{fn:^10}')
     print()
-    print(f'Precision: {tp/(tp + fp)}')
-    print(f'Recall: {tp/(tp + fn)}')
+    print(f'Precision{iou_str}: {tp/(tp + fp)}')
+    print(f'Recall{iou_str}: {tp/(tp + fn)}')

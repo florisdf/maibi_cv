@@ -5,7 +5,7 @@ import torch
 
 
 import torchvision.models.detection.mask_rcnn
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 
 from .coco_utils import get_coco_api_from_dataset
