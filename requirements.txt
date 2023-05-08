@@ -12,3 +12,4 @@ albumentations
 k3d
 timm
 ipykernel
+open3d
