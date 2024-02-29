@@ -14,7 +14,7 @@ at the master AI for Business and Industry.
 - If you do get a `command not found` error, you can install Conda as follows:
 
 ```bash
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+wget https://repo.anaconda.com/miniconda/Miniconda3-py310_24.1.2-0-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh -b -p $VSC_DATA/miniconda3
 echo 'export PATH="${VSC_DATA}/miniconda3/bin:${PATH}"' >> ~/.bashrc
 source ~/.bashrc
@@ -26,7 +26,7 @@ source ~/.bashrc
 cd $VSC_DATA
 git clone https://github.com/florisdf/maibi_cv.git
 cd maibi_cv
-conda create -n maibi_cv
+conda create -n maibi_cv python=3.10
 source activate maibi_cv
 pip install -r requirements.txt --no-cache-dir
 python -m ipykernel install --prefix=${VSC_HOME}/.local --name maibi_cv
