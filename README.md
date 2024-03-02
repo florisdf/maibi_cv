@@ -15,7 +15,7 @@ at the master AI for Business and Industry.
 
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-py310_24.1.2-0-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b -p $VSC_DATA/miniconda3
+bash Miniconda3-py310_24.1.2-0-Linux-x86_64.sh -b -p $VSC_DATA/miniconda3
 echo 'export PATH="${VSC_DATA}/miniconda3/bin:${PATH}"' >> ~/.bashrc
 source ~/.bashrc
 ```
