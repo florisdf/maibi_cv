@@ -10,7 +10,7 @@ def get_radiometric_response_curve(imgs, exposure_times, n_sample_per_dim=20):
     width_step = width // n_sample_per_dim
     height_step = height // n_sample_per_dim
 
-    mask = np.zeros((height, width), dtype=np.bool8)
+    mask = np.zeros((height, width), dtype=np.bool_)
     mask[::height_step, ::width_step] = True
 
     gs = []
