@@ -1,3 +1,5 @@
+
+
 # Computer Vision - MAIBI
 
 This repository contains the notebooks for the course of Computer Vision, given 
@@ -44,7 +46,7 @@ python -m ipykernel install --prefix=${VSC_HOME}/.local --name maibi_cv
 
 ## Install Python and pip
 
-If this is not yes installed, see <https://www.python.org/downloads/> for
+If this is not yet installed, see <https://www.python.org/downloads/> for
 instructions.
 
 Also, make sure pip is installed. See
